@@ -17,7 +17,12 @@ test.describe('Booking API', () => {
 
   test('GET single booking returns correct structure', async () => {
     const api = await request.newContext();
-    const response = await api.get(`${BASE_URL}/booking/1`);
+
+    const listResponse = await api.get(`${BASE_URL}/booking`);
+    const list = await listResponse.json();
+    const firstId = list[0].bookingid;
+
+    const response = await api.get(`${BASE_URL}/booking/${firstId}`);
 
     expect(response.status()).toBe(200);
 
