@@ -28,4 +28,4 @@ npx playwright test
 ```
 
 ## Status
-🚧 In progress — built during an intensive 8-week automation sprint.
+🚧 Work in progress.
