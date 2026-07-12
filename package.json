@@ -3,7 +3,11 @@
   "version": "1.0.0",
   "description": "**Bogdan Carcadea** — Senior QA Engineer",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/cmbogdan99-dotcom/qa-automation-portfolio.git"
@@ -11,7 +15,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
+  "type": "module",
   "bugs": {
     "url": "https://github.com/cmbogdan99-dotcom/qa-automation-portfolio/issues"
   },
@@ -19,5 +23,8 @@
   "devDependencies": {
     "@playwright/test": "^1.61.1",
     "@types/node": "^26.1.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
   }
 }
