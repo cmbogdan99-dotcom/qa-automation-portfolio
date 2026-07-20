@@ -26,4 +26,24 @@ export class PortfolioPage {
   sectionHeading(text: string) {
     return this.page.getByRole('heading', { name: text });
   }
+
+  homeLink() {
+    return this.page.getByRole('link', { name: 'Home' });
+  }
+
+  themeToggle() {
+    return this.page.getByRole('button', { name: 'Toggle theme' });
+  }
+
+  galleryCard(name: string) {
+    return this.page.locator('article').filter({ hasText: name });
+  }
+
+  dlcItem(name: string) {
+    return this.page.getByText(name, { exact: true });
+  }
+
+  externalLinkButton(label: string) {
+    return this.page.getByRole('link', { name: new RegExp(label) });
+  }
 }

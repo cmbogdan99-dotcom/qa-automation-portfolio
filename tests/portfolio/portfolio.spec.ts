@@ -50,7 +50,7 @@ test.describe('portfolio smoke', () => {
       page.getByRole('heading', { name: 'Everything I have worked on' }),
     ).toBeVisible();
     await expect(page.getByText('Personal projects', { exact: true })).toBeVisible();
-    await expect(page.getByText('Gaming — Ubisoft & EA')).toBeVisible();
+    await expect(page.getByText('Gaming', { exact: true })).toBeVisible();
   });
 
   test('external profile links point to the right accounts', async ({ page }) => {
@@ -78,5 +78,78 @@ test.describe('portfolio smoke', () => {
     await page.waitForLoadState('networkidle');
 
     expect(errors).toEqual([]);
+  });
+
+  test('theme toggle switches the data-theme attribute and persists on reload', async ({ page }) => {
+    const portfolio = new PortfolioPage(page);
+    await portfolio.goto();
+
+    const html = page.locator('html');
+    const initialTheme = await html.getAttribute('data-theme');
+
+    await portfolio.themeToggle().click();
+
+    const expectedTheme = initialTheme === 'light' ? 'dark' : 'light';
+    await expect(html).toHaveAttribute('data-theme', expectedTheme);
+
+    // theme is persisted to localStorage — reload and confirm it stuck
+    await page.reload();
+    await expect(html).toHaveAttribute('data-theme', expectedTheme);
+  });
+
+  test('nav Home link points to the site root', async ({ page }) => {
+    const portfolio = new PortfolioPage(page);
+    await portfolio.goto();
+
+    await expect(portfolio.homeLink()).toHaveAttribute('href', '/');
+
+    await portfolio.homeLink().click();
+    await expect(page).toHaveURL('https://bogdan-carcadea.ro/');
+  });
+
+  test('gallery card hover reveals DLC sub-cards', async ({ page }) => {
+    const portfolio = new PortfolioPage(page);
+    await portfolio.gotoProjects();
+
+    const card = portfolio.galleryCard("Assassin's Creed Shadows");
+    await card.hover();
+
+    await expect(portfolio.dlcItem('Claws of Awaji')).toBeVisible();
+  });
+
+  test('CV download button links to the resolved CV PDF path', async ({ page }) => {
+    const portfolio = new PortfolioPage(page);
+    await portfolio.goto();
+
+    await expect(portfolio.cvDownloadLink()).toHaveAttribute(
+      'href',
+      '/cv/bogdan-carcadea-cv.pdf',
+    );
+  });
+
+  test('gallery card external link opens the live app in a new tab', async ({ page }) => {
+    const portfolio = new PortfolioPage(page);
+    await portfolio.gotoProjects();
+
+    const openAppLink = portfolio.externalLinkButton('Open app');
+    await expect(openAppLink).toHaveAttribute(
+      'href',
+      'https://cmbogdan99-dotcom.github.io/dltate/',
+    );
+    await expect(openAppLink).toHaveAttribute('target', '_blank');
+    await expect(openAppLink).toHaveAttribute('rel', 'noopener noreferrer');
+  });
+
+  test('LinkedIn and GitHub contact links open in a new tab', async ({ page }) => {
+    const portfolio = new PortfolioPage(page);
+    await portfolio.goto();
+
+    const linkedin = page.getByRole('link', { name: 'LinkedIn' });
+    const github = page.getByRole('link', { name: 'GitHub' });
+
+    await expect(linkedin).toHaveAttribute('target', '_blank');
+    await expect(linkedin).toHaveAttribute('rel', 'noopener noreferrer');
+    await expect(github).toHaveAttribute('target', '_blank');
+    await expect(github).toHaveAttribute('rel', 'noopener noreferrer');
   });
 });
