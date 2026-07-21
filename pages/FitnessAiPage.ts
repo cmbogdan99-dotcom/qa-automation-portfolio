@@ -66,4 +66,67 @@ export class FitnessAiPage {
   async currentTheme(): Promise<string | null> {
     return this.page.evaluate(() => document.documentElement.getAttribute('data-theme'));
   }
+
+  async gotoDashboard() {
+    await this.navButton('Dashboard').click();
+  }
+
+  async gotoNutrition() {
+    await this.navButton('Nutrition & Journal').click();
+  }
+
+  /**
+   * Hitting an XP milestone (e.g. logging the day's first water/meal) pops a
+   * full-screen "New level!" modal that blocks every other control until
+   * dismissed. Call this after any logging action before interacting further.
+   */
+  async dismissLevelUpIfPresent() {
+    const continueButton = this.page.getByRole('button', { name: 'Continue', exact: true });
+    if (await continueButton.isVisible().catch(() => false)) {
+      await continueButton.click();
+    }
+  }
+
+  async logWater(amount: 250 | 500 | 750) {
+    await this.page.getByRole('button', { name: `+${amount}ml` }).click();
+    await this.dismissLevelUpIfPresent();
+  }
+
+  /** The WATER mini-stat card on the dashboard — always rendered as 2-decimal liters, e.g. "3.00L". */
+  async waterTotalLiters(): Promise<number> {
+    const card = this.page.locator('.card.cp').filter({ hasText: 'Water' }).first();
+    const text = await card.locator('div').nth(1).innerText();
+    return parseFloat(text.replace('L', ''));
+  }
+
+  /** The "kcal ramase" gauge on the dashboard — present from first load (target) and updates as meals are logged. It's rendered as SVG text, so read via textContent rather than innerText. */
+  async remainingKcal(): Promise<number> {
+    const card = this.page.locator('.card.cp').filter({ hasText: 'kcal ramase' });
+    const text = await card.getByText(/^\d+$/).textContent();
+    return Number(text);
+  }
+
+  /** kcal badge on the first generated meal in the plan, e.g. "585 kcal". */
+  async nextGeneratedMealKcal(): Promise<number> {
+    const text = await this.page.getByText(/^\d+ kcal$/).first().innerText();
+    return Number(text.replace(' kcal', ''));
+  }
+
+  /** Macro summary line on the first generated meal in the plan — "NNg P · NNg C · NNg G". */
+  async nextGeneratedMealMacros(): Promise<{ protein: number; carbs: number; fats: number }> {
+    const text = await this.page.getByText(/^\d+g P · \d+g C · \d+g G$/).first().innerText();
+    const [, protein, carbs, fats] = text.match(/^(\d+)g P · (\d+)g C · (\d+)g G$/)!;
+    return { protein: Number(protein), carbs: Number(carbs), fats: Number(fats) };
+  }
+
+  async addFirstGeneratedMeal() {
+    await this.page.getByRole('button', { name: 'Add', exact: true }).first().click();
+    await this.dismissLevelUpIfPresent();
+  }
+
+  /** Consumed grams for Protein/Carbs/Fats, in that fixed render order — "NN/NNNg". */
+  async macroConsumedGrams(): Promise<number[]> {
+    const values = await this.page.getByText(/^\d+\/\d+g$/).allInnerTexts();
+    return values.map((v) => Number(v.split('/')[0]));
+  }
 }
