@@ -81,8 +81,12 @@ export class FitnessAiPage {
    * dismissed. Call this after any logging action before interacting further.
    */
   async dismissLevelUpIfPresent() {
+    // isVisible() already resolves to false (no throw) when the button isn't
+    // present — no try/catch here, so a real error (e.g. a strict-mode
+    // violation from a second "Continue" button elsewhere) surfaces instead
+    // of being silently treated as "modal absent".
     const continueButton = this.page.getByRole('button', { name: 'Continue', exact: true });
-    if (await continueButton.isVisible().catch(() => false)) {
+    if (await continueButton.isVisible()) {
       await continueButton.click();
     }
   }
@@ -94,7 +98,10 @@ export class FitnessAiPage {
 
   /** The WATER mini-stat card on the dashboard — always rendered as 2-decimal liters, e.g. "3.00L". */
   async waterTotalLiters(): Promise<number> {
-    const card = this.page.locator('.card.cp').filter({ hasText: 'Water' }).first();
+    // Scoped by an exact-text "Water" label (not hasText, which is a substring
+    // match) — "Water today" and the weekly-activity legend's "Meals/Water"
+    // both also contain the word "Water" and would otherwise match too.
+    const card = this.page.locator('.card.cp').filter({ has: this.page.getByText('Water', { exact: true }) });
     const text = await card.locator('div').nth(1).innerText();
     return parseFloat(text.replace('L', ''));
   }
@@ -102,7 +109,7 @@ export class FitnessAiPage {
   /** The "kcal ramase" gauge on the dashboard — present from first load (target) and updates as meals are logged. It's rendered as SVG text, so read via textContent rather than innerText. */
   async remainingKcal(): Promise<number> {
     const card = this.page.locator('.card.cp').filter({ hasText: 'kcal ramase' });
-    const text = await card.getByText(/^\d+$/).textContent();
+    const text = await card.getByText(/^-?\d+$/).textContent();
     return Number(text);
   }
 

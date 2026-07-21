@@ -21,6 +21,9 @@ export class TransferFundsPage {
   }
 
   async isSuccessful(): Promise<boolean> {
-    return await this.page.getByText('Transfer Complete!').isVisible();
+    // ParaBank's public demo is slow/flaky (see README) — wait for the confirmation
+    // text instead of a single immediate isVisible() check, which raced the render.
+    await this.page.getByText('Transfer Complete!').waitFor({ state: 'visible' });
+    return true;
   }
 }
