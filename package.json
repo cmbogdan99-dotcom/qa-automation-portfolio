@@ -1,20 +1,37 @@
 {
   "name": "qa-automation-portfolio",
   "version": "1.0.0",
-  "description": "**Bogdan Carcadea** — Senior QA Engineer",
+  "description": "Maintainable multi-target test automation framework covering UI, API (Playwright and Pytest), fintech-domain scenarios and live-app E2E, with GitHub Actions CI and Docker.",
   "main": "index.js",
   "scripts": {
     "test": "playwright test",
-    "test:ui": "playwright test --ui",
-    "test:debug": "playwright test --debug"
+    "test:ui": "playwright test tests/ui",
+    "test:api": "playwright test tests/api",
+    "test:fintech": "playwright test tests/fintech",
+    "test:live": "playwright test tests/portfolio tests/fitness-ai",
+    "test:debug": "playwright test --debug",
+    "report": "playwright show-report"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/cmbogdan99-dotcom/qa-automation-portfolio.git"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "qa",
+    "test-automation",
+    "playwright",
+    "typescript",
+    "pytest",
+    "python",
+    "api-testing",
+    "e2e",
+    "page-object-model",
+    "github-actions",
+    "docker",
+    "ci-cd"
+  ],
+  "author": "Bogdan Carcadea",
+  "license": "MIT",
   "type": "module",
   "bugs": {
     "url": "https://github.com/cmbogdan99-dotcom/qa-automation-portfolio/issues"
