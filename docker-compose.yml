@@ -1,0 +1,19 @@
+# Run both test stacks with a single `docker compose up`.
+# Reports are mounted back to the host so they survive the containers.
+services:
+  ui-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: qa-ui-tests
+    volumes:
+      - ./playwright-report:/app/playwright-report
+      - ./test-results:/app/test-results
+
+  api-tests:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: qa-api-tests
+    volumes:
+      - ./api-tests:/app

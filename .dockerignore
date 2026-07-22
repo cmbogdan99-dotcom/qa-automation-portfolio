@@ -1,0 +1,10 @@
+node_modules
+playwright-report
+test-results
+blob-report
+.git
+api-tests/.venv
+api-tests/.pytest_cache
+api-tests/report.html
+**/__pycache__
+*.pyc
