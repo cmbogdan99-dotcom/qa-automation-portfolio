@@ -148,3 +148,11 @@ vite.config.ts.timestamp-*
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+# Python / pytest (api-tests)
+api-tests/.venv/
+api-tests/report.html
+api-tests/.pytest_cache/
+**/__pycache__/
+*.pyc
+report.html
